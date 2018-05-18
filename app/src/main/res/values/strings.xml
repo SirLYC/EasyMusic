@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">EasyMusic</string>
+    <string name="content_guid">欢迎使用EasyMusic，请选择</string>
+    <string name="content_dialog_guid">是否立刻扫描本地音乐文件？</string>
+    <string name="action_ok">是</string>
+    <string name="action_no">否</string>
+    <string name="action_cancel">取消</string>
+    <string name="action_self_scan">自定义扫描</string>
+    <string name="title_fragment_song_list_list">所有列表</string>
+    <string name="action_upload_local_list">更新本地音乐</string>
+    <string name="action_enter_without_upload">不更新进入</string>
+
+    <string name="error_read_list_error">读取列表失败</string>
+    <string name="title_menu_edit">编辑</string>
+    <string name="title_menu_check_all">全选</string>
+    <string name="title_menu_finish">完成</string>
+
+    <string name="content_scanning">正在更新本地曲库</string>
+    <string name="content_reading_list">正在读取本地列表</string>
+    <string name="error_no_permission">获取权限失败</string>
+
+    <string name="hint_scan_finished">扫描完成</string>
+    <string name="hint_scan_0">未扫描到本地歌曲</string>
+    <string name="title_menu_delete">删除</string>
+</resources>

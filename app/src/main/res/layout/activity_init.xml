@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/tv_welcome"
+        android:gravity="center_horizontal"
+        android:text="@string/content_guid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_marginTop="16dp"
+        android:id="@+id/bt_update_local_list"
+        android:text="@string/action_upload_local_list"
+        app:layout_constraintTop_toBottomOf="@id/tv_welcome"
+        android:textAllCaps="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:layout_marginTop="16dp"
+        android:id="@+id/bt_enter_without_update"
+        android:text="@string/action_enter_without_upload"
+        app:layout_constraintTop_toBottomOf="@id/bt_update_local_list"
+        android:textAllCaps="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+</android.support.constraint.ConstraintLayout>
