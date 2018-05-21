@@ -42,7 +42,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
                 "path text, " +
                 "duration integer, " +
                 "size integer, " +
-                "listName text references $TABLE_HISTORY(name) on update cascade on delete cascade, " +
+                "listName text not null references $TABLE_HISTORY(name) on update cascade on delete cascade, " +
                 "primary key (album, listName))")
 
         db.execSQL("create table $TABLE_HISTORY (" +
@@ -85,16 +85,23 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
 
     // try best
     // not assure success
-    fun deleteList(name: String) {
-        writableDatabase.delete(TABLE_LIST, "name=?", arrayOf(name))
+    fun deleteList(name: String): Boolean {
+        return writableDatabase.delete(TABLE_LIST, "name=?", arrayOf(name)) != 0
     }
 
-    fun insertSongToList(song: Song, listName: String): Boolean {
+    fun updateSortMethod(name: String, sortMethod: Int): Boolean {
+        return writableDatabase.update(TABLE_LIST, ContentValues().apply {
+            put("name", name)
+            put("sortMethod", sortMethod)
+        }, "name=?", arrayOf(name)) != 0
+    }
+
+    fun insertSongToList(listName: String, song: Song): Boolean {
         writableDatabase.delete(TABLE_SONG, "path=? and listName=?", arrayOf(song.path, listName))
         return writableDatabase.insert(TABLE_SONG, null, packageSong(song).apply { put("listName", listName) }) != -1L
     }
 
-    fun deleteSong(song: Song, listName: String): Boolean {
+    fun deleteSong(listName: String, song: Song): Boolean {
         return writableDatabase.delete(TABLE_SONG, "path=? and listName=?", arrayOf(song.path, listName)) != 0
     }
 
@@ -165,5 +172,6 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
     }
 
     override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        // TODO: 2018/5/21 if need
     }
 }
