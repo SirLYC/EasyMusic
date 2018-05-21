@@ -26,8 +26,7 @@ class MusicManager(
 
     private val appContext = context.applicationContext
 
-    val playingList = ObservableList(mutableListOf<Song>())
-    val historyList = ObservableList(mutableListOf<Song>())
+    val musicListList = ObservableList(mutableListOf<MusicList>())
 
     val defaultList = MusicList(NAME_DEFAULT, ObservableList(mutableListOf()))
     val likeList = MusicList(NAME_LIKE, ObservableList(mutableListOf()))

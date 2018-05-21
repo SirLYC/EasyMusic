@@ -2,22 +2,20 @@ package com.liuyuchuan.easymusic.list
 
 import android.arch.lifecycle.Observer
 import android.os.Bundle
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import com.liuyuchuan.easymusic.BaseFragment
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.MusicList
-import com.liuyuchuan.easymusic.utils.ReactiveAdapter
-import com.liuyuchuan.easymusic.utils.musicListCheckableItem
-import com.liuyuchuan.easymusic.utils.provideViewModel
-import com.liuyuchuan.easymusic.utils.setTitle
+import com.liuyuchuan.easymusic.utils.*
 import kotlinx.android.synthetic.main.fragment_song_list_list.*
 import me.drakeet.multitype.MultiTypeAdapter
 
 /**
  * Created by Liu Yuchuan on 2018/5/7.
  */
-class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickListener {
+class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickListener, SwipeRefreshLayout.OnRefreshListener {
     private lateinit var listManageViewModel: ListManageViewModel
     private lateinit var adapter: MultiTypeAdapter
     private lateinit var checkableItemViewBinder: ListItemViewBinder
@@ -48,6 +46,24 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
 
         rv_song_list_list.adapter = adapter
         rv_song_list_list.layoutManager = LinearLayoutManager(context)
+        srl_song_list_list.setOnRefreshListener(this)
+
+        listManageViewModel.listRefreshState.observe(this, Observer {
+            when (it) {
+                is RefreshState.Empty -> {
+                    srl_song_list_list.isRefreshing = false
+                    listManageViewModel.refreshList()
+                }
+                is RefreshState.Refreshing -> srl_song_list_list.isRefreshing = true
+                else -> srl_song_list_list.isRefreshing = false
+            }
+        })
+
+        listManageViewModel.listRefreshEvent.observe(this, Observer {
+            when (it) {
+                is RefreshState.Error -> toast(it.msg)
+            }
+        })
     }
 
     override fun onSongListItemClick(item: MusicList) {
@@ -123,5 +139,9 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
         }
 
         checkableItemViewBinder.enableCheck = enable
+    }
+
+    override fun onRefresh() {
+        listManageViewModel.refreshList()
     }
 }

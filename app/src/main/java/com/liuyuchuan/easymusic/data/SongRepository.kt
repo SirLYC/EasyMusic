@@ -9,21 +9,39 @@ import io.reactivex.Observable
 class SongRepository(
         private val dbHelper: DBHelper
 ) {
-    fun getAllList() = Observable.just(dbHelper.readSongList())
+    fun getAllList(): Observable<List<MusicList>> {
+        return Observable.just(dbHelper.readSongList())
+    }
 
-    fun getHistory() = Observable.just(dbHelper.readHistory())
+    fun getHistory(): Observable<List<Song>> {
+        return Observable.just(dbHelper.readHistory())
+    }
 
-    fun createList(listName: String) = Observable.just(dbHelper.insertList(listName))
+    fun createList(listName: String): Observable<Boolean> {
+        return Observable.just(dbHelper.insertList(listName))
+    }
 
-    fun deleteList(listName: String) = Observable.just(dbHelper.deleteList(listName))
+    fun deleteList(listName: String): Observable<Boolean> {
+        return Observable.just(dbHelper.deleteList(listName))
+    }
 
-    fun updateSortMethod(listName: String, sortMethod: Int) = Observable.just(dbHelper.updateSortMethod(listName, sortMethod))
+    fun updateSortMethod(listName: String, sortMethod: Int): Observable<Boolean> {
+        return Observable.just(dbHelper.updateSortMethod(listName, sortMethod))
+    }
 
-    fun addSongTo(listName: String, song: Song) = Observable.just(dbHelper.insertSongToList(listName, song))
+    fun addSongTo(listName: String, song: Song): Observable<Boolean> {
+        return Observable.just(dbHelper.insertSongToList(listName, song))
+    }
 
-    fun deleteSing(listName: String, song: Song) = Observable.just(dbHelper.deleteSong(listName, song))
+    fun deleteSing(listName: String, song: Song): Observable<Boolean> {
+        return Observable.just(dbHelper.deleteSong(listName, song))
+    }
 
-    fun deleteHistory(song: Song) = Observable.just(dbHelper.deleteHistory(song))
+    fun deleteHistory(song: Song): Observable<Boolean> {
+        return Observable.just(dbHelper.deleteHistory(song))
+    }
 
-    fun addHistory(song: Song) = Observable.just(dbHelper.insertHistory(song))
+    fun addHistory(song: Song): Observable<Boolean> {
+        return Observable.just(dbHelper.insertHistory(song))
+    }
 }

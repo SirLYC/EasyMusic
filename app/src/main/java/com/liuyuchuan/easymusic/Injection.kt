@@ -3,6 +3,8 @@ package com.liuyuchuan.easymusic
 import android.app.Application
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import com.liuyuchuan.easymusic.data.SongRepository
+import com.liuyuchuan.easymusic.db.DBHelper
 import com.liuyuchuan.easymusic.list.ListManageViewModel
 import com.liuyuchuan.easymusic.utils.MusicManager
 
@@ -10,16 +12,19 @@ import com.liuyuchuan.easymusic.utils.MusicManager
  * Created by Liu Yuchuan on 2018/5/2.
  */
 class Injection(app: Application) : ViewModelProvider.AndroidViewModelFactory(app) {
-    val musicManager = MusicManager(app)
+    private val musicManager = MusicManager(app)
+    private val songRepository = SongRepository(DBHelper(app))
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return modelClass.run {
             when {
-                isAssignableFrom(InitViewModel::class.java) -> InitViewModel(musicManager)
-                isAssignableFrom(ListManageViewModel::class.java) -> ListManageViewModel(musicManager)
+                isAssignableFrom(InitViewModel::class.java) -> InitViewModel(musicManager, songRepository)
+                isAssignableFrom(ListManageViewModel::class.java) -> ListManageViewModel(musicManager, songRepository)
                 else -> super.create(modelClass)
             }
         } as T
     }
+
+    fun musicManager() = musicManager
 }

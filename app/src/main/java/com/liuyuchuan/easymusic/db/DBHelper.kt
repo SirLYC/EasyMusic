@@ -43,7 +43,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
                 "duration integer, " +
                 "size integer, " +
                 "listName text not null references $TABLE_HISTORY(name) on update cascade on delete cascade, " +
-                "primary key (album, listName))")
+                "primary key (path, listName))")
 
         db.execSQL("create table $TABLE_HISTORY (" +
                 "name text, " +
@@ -108,6 +108,17 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
     fun readSongList(): List<MusicList> {
         val songList = mutableListOf<MusicList>()
         val map = hashMapOf<String, Int>()
+
+        readableDatabase.query(TABLE_LIST, null, null, null, null, null, null).use { cursor ->
+            if (cursor.moveToFirst()) {
+                do {
+                    val name = cursor.getString(cursor.getColumnIndex("name"))
+                    songList.add(MusicList(name, ObservableList(mutableListOf())))
+                    map[name] = songList.size - 1
+                } while (cursor.moveToNext())
+            }
+        }
+
         readableDatabase.query(TABLE_SONG, null, null, null, null, null, null).use { cursor ->
             if (cursor.moveToFirst()) {
                 do {
