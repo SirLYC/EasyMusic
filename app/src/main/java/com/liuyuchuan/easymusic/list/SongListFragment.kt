@@ -8,6 +8,7 @@ import com.liuyuchuan.easymusic.BaseFragment
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.data.Song
+import com.liuyuchuan.easymusic.play.PlayActivity
 import com.liuyuchuan.easymusic.utils.*
 import kotlinx.android.synthetic.main.fragment_song_list.*
 
@@ -62,7 +63,8 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
     }
 
     override fun onSongItemClick(item: Song) {
-        // TODO: 2018/5/10 play the song
+        songListViewModel.chooseSongToPlay(item)
+        PlayActivity.start(activity!!, true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

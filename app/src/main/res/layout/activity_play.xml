@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="ContentDescription"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/tv_play_song_info"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@id/acsb_play_progress"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="info"/>
+
+    <TextView
+        android:id="@+id/tv_play_position_now"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_time_0"
+        app:layout_constraintBottom_toBottomOf="@id/acsb_play_progress"
+        app:layout_constraintEnd_toStartOf="@id/acsb_play_progress"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/acsb_play_progress"
+        tools:text="1:00"/>
+
+    <android.support.v7.widget.AppCompatSeekBar
+        android:id="@+id/acsb_play_progress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:layout_constraintBottom_toTopOf="@id/iv_play_or_pause"
+        app:layout_constraintEnd_toStartOf="@id/tv_play_duration"
+        app:layout_constraintStart_toEndOf="@id/tv_play_position_now"
+        app:layout_constraintTop_toBottomOf="@id/tv_play_song_info"/>
+
+    <TextView
+        android:id="@+id/tv_play_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_time_0"
+        app:layout_constraintBottom_toBottomOf="@id/acsb_play_progress"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/acsb_play_progress"
+        app:layout_constraintTop_toTopOf="@id/acsb_play_progress"
+        tools:text="3:00"/>
+
+    <ImageView
+        android:id="@+id/iv_play_or_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_play"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+
+    <ImageView
+        android:id="@+id/iv_play_pre"
+        android:layout_width="52dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play_previous"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_or_pause"
+        app:layout_constraintEnd_toStartOf="@+id/iv_play_or_pause"
+        app:layout_constraintStart_toEndOf="@+id/iv_play_mode"
+        app:layout_constraintTop_toTopOf="@id/iv_play_or_pause"/>
+
+
+    <ImageView
+        android:id="@+id/iv_play_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play_next"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_or_pause"
+        app:layout_constraintEnd_toStartOf="@+id/iv_play_list"
+        app:layout_constraintStart_toEndOf="@id/iv_play_or_pause"
+        app:layout_constraintTop_toTopOf="@id/iv_play_or_pause"/>
+
+    <ImageView
+        android:padding="8dp"
+        android:id="@+id/iv_play_mode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_list"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_or_pause"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_play_or_pause"/>
+
+
+    <ImageView
+        android:padding="8dp"
+        android:id="@+id/iv_play_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_queue_music"
+        app:layout_constraintBottom_toBottomOf="@id/iv_play_or_pause"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/iv_play_or_pause"/>
+
+</android.support.constraint.ConstraintLayout>

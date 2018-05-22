@@ -3,19 +3,18 @@ package com.liuyuchuan.easymusic.list
 import android.arch.lifecycle.ViewModel
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.data.Song
-import com.liuyuchuan.easymusic.utils.CheckableItem
-import com.liuyuchuan.easymusic.utils.NonNullLiveData
-import com.liuyuchuan.easymusic.utils.ObservableList
-import com.liuyuchuan.easymusic.utils.SyncChangeListCallback
+import com.liuyuchuan.easymusic.utils.*
 
 /**
  * Created by Liu Yuchuan on 2018/5/7.
  */
-class SongListViewModel : ViewModel() {
+class SongListViewModel(
+        private val musicManager: MusicManager
+) : ViewModel() {
     private lateinit var musicList: MusicList
 
     val songList = ObservableList(mutableListOf<CheckableItem<Song>>())
-    val enableSelectLiveData = NonNullLiveData<Boolean>(false)
+    val enableSelectLiveData = NonNullLiveData(false)
 
     fun init(musicList: MusicList) {
         songList.clear()
@@ -29,5 +28,22 @@ class SongListViewModel : ViewModel() {
 
     fun enableCheck(enable: Boolean) {
         enableSelectLiveData.value = enable
+    }
+
+    fun chooseSongToPlay(song: Song) {
+        musicManager.playingList.clear()
+        musicManager.playingList.addAll(musicList.list)
+        val index = musicManager.playingList.indexOf(song).let {
+            if (it == -1) {
+                0
+            } else {
+                it
+            }
+        }
+        musicManager.playPosition = index
+    }
+
+    fun addSongToPlayList(song: Song) {
+        musicManager.playingList.add(song)
     }
 }

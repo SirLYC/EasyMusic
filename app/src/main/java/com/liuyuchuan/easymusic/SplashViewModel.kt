@@ -12,7 +12,7 @@ import io.reactivex.internal.disposables.ListCompositeDisposable
 /**
  * Created by Liu Yuchuan on 2018/5/16.
  */
-class InitViewModel(
+class SplashViewModel(
         private val musicManager: MusicManager,
         private val songRepository: SongRepository
 ) : ViewModel() {
@@ -40,6 +40,18 @@ class InitViewModel(
                     })
                     .also { disposables.add(it) }
         }
+    }
+
+    fun readHistory() {
+        songRepository.getHistory()
+                .async()
+                .subscribe({
+                    musicManager.historyList.addAll(it)
+                }, {
+                    ifDebug {
+                        println(it)
+                    }
+                })
     }
 
     override fun onCleared() {

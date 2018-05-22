@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProvider
 import com.liuyuchuan.easymusic.data.SongRepository
 import com.liuyuchuan.easymusic.db.DBHelper
 import com.liuyuchuan.easymusic.list.ListManageViewModel
+import com.liuyuchuan.easymusic.list.SongListViewModel
 import com.liuyuchuan.easymusic.utils.MusicManager
 
 /**
@@ -19,12 +20,14 @@ class Injection(app: Application) : ViewModelProvider.AndroidViewModelFactory(ap
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return modelClass.run {
             when {
-                isAssignableFrom(InitViewModel::class.java) -> InitViewModel(musicManager, songRepository)
+                isAssignableFrom(SplashViewModel::class.java) -> SplashViewModel(musicManager, songRepository)
                 isAssignableFrom(ListManageViewModel::class.java) -> ListManageViewModel(musicManager, songRepository)
+                isAssignableFrom(SongListViewModel::class.java) -> SongListViewModel(musicManager)
                 else -> super.create(modelClass)
             }
         } as T
     }
 
     fun musicManager() = musicManager
+    fun songRepository() = songRepository
 }

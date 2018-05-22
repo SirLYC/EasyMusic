@@ -26,12 +26,15 @@ class MusicManager(
 
     private val appContext = context.applicationContext
 
+    val playingList = ObservableList<Song>(mutableListOf())
+    var playPosition = -1
+
     val musicListList = ObservableList(mutableListOf<MusicList>())
 
     val defaultList = MusicList(NAME_DEFAULT, ObservableList(mutableListOf()))
     val likeList = MusicList(NAME_LIKE, ObservableList(mutableListOf()))
     val myLists = ObservableList(mutableListOf<MusicList>())
-
+    val historyList = ObservableList(mutableListOf<Song>())
 
     private fun savedDirectory(editable: Boolean = false) = appContext.cacheDir.let {
         File(it, NAME_DIR)

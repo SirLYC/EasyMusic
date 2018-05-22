@@ -4,16 +4,18 @@ import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import com.liuyuchuan.easymusic.BaseActivity
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.MusicList
+import com.liuyuchuan.easymusic.play.PlayActivity
 import com.liuyuchuan.easymusic.utils.provideViewModel
 import kotlinx.android.synthetic.main.activity_list_manage.*
 
 /**
  * Created by Liu Yuchuan on 2018/5/6.
  */
-class ListManageActivity : BaseActivity() {
+class ListManageActivity : BaseActivity(), View.OnClickListener {
     private lateinit var listManageViewModel: ListManageViewModel
 
     companion object {
@@ -28,6 +30,8 @@ class ListManageActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list_manage)
         setSupportActionBar(toolbar)
+
+        fab_to_playing.setOnClickListener(this)
 
         listManageViewModel = provideViewModel()
 
@@ -59,6 +63,12 @@ class ListManageActivity : BaseActivity() {
             listManageViewModel.selectedMusicListLiveData.value = null
         } else {
             super.onBackPressed()
+        }
+    }
+
+    override fun onClick(v: View) {
+        when (v.id) {
+            R.id.fab_to_playing -> PlayActivity.start(this)
         }
     }
 }
