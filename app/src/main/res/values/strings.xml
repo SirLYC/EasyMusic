@@ -16,4 +16,6 @@
     <string name="hint_no_song_playing">当前无歌曲正在播放</string>
     <string name="hint_time_0">0:00</string>
     <string name="history">历史记录</string>
+    <string name="title_activity_playing_list">播放列表</string>
+    <string name="title_activity_history">历史记录</string>
 </resources>

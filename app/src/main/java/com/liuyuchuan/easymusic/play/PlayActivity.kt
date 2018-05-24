@@ -115,9 +115,7 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
             R.id.iv_play_pre -> musicBinder.playPre()
             R.id.iv_play_or_pause -> musicBinder.playOrPause()
             R.id.iv_play_mode -> musicBinder.changeMode()
-            R.id.iv_play_list -> {
-                // TODO: 2018/5/22 show playing list
-            }
+            R.id.iv_play_list -> startActivity(Intent(this, PlayingListActivity::class.java))
         }
     }
 

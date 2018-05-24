@@ -30,6 +30,7 @@ class HistoryActivity : BaseActivity(), View.OnClickListener,
         setContentView(R.layout.activity_history)
 
         setSupportActionBar(toolbar)
+        supportActionBar?.setTitle(R.string.title_activity_history)
 
         historyViewModel = provideViewModel()
 

@@ -8,6 +8,7 @@ import com.liuyuchuan.easymusic.db.DBHelper
 import com.liuyuchuan.easymusic.history.HistoryViewModel
 import com.liuyuchuan.easymusic.list.ListManageViewModel
 import com.liuyuchuan.easymusic.list.SongListViewModel
+import com.liuyuchuan.easymusic.play.PlayingListViewModel
 import com.liuyuchuan.easymusic.utils.MusicManager
 
 /**
@@ -25,6 +26,7 @@ class Injection(app: Application) : ViewModelProvider.AndroidViewModelFactory(ap
                 isAssignableFrom(ListManageViewModel::class.java) -> ListManageViewModel(musicManager, songRepository)
                 isAssignableFrom(SongListViewModel::class.java) -> SongListViewModel(musicManager)
                 isAssignableFrom(HistoryViewModel::class.java) -> HistoryViewModel(songRepository, musicManager)
+                isAssignableFrom(PlayingListViewModel::class.java) -> PlayingListViewModel(musicManager)
                 else -> super.create(modelClass)
             }
         } as T
