@@ -17,6 +17,7 @@ class SongListViewModel(
     val enableSelectLiveData = NonNullLiveData(false)
 
     fun init(musicList: MusicList) {
+        songList.removeAllCallbacks()
         songList.clear()
         this.musicList = musicList
         songList.addAll(musicList.list.map {

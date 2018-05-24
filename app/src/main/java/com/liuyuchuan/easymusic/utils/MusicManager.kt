@@ -2,7 +2,6 @@ package com.liuyuchuan.easymusic.utils
 
 import android.content.Context
 import android.provider.MediaStore
-import android.support.annotation.WorkerThread
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.data.Song
 import io.reactivex.Observable
@@ -34,7 +33,7 @@ class MusicManager(
     val defaultList = MusicList(NAME_DEFAULT, ObservableList(mutableListOf()))
     val likeList = MusicList(NAME_LIKE, ObservableList(mutableListOf()))
     val myLists = ObservableList(mutableListOf<MusicList>())
-    val historyList = ObservableList(mutableListOf<Song>())
+//    val historyList = ObservableList(mutableListOf<Song>())
 
     private fun savedDirectory(editable: Boolean = false) = appContext.cacheDir.let {
         File(it, NAME_DIR)
@@ -53,51 +52,51 @@ class MusicManager(
     // work on worker thread
     // try best to cache the list
     // cannot assure 100% saved
-    @WorkerThread
-    @Synchronized
-    fun saveList(musicList: MusicList) {
-        savedTargetFile(musicList)?.writeJson(musicList)
-    }
+//    @WorkerThread
+//    @Synchronized
+//    fun saveList(musicList: MusicList) {
+//        savedTargetFile(musicList)?.writeJson(musicList)
+//    }
 
-    fun readList(readDefault: Boolean): Observable<Map<String, Boolean>> {
-        return Observable.create<Map<String, Boolean>> {
-            val map = hashMapOf<String, Boolean>()
-
-            if (readDefault) {
-                val localDefaultList = savedTargetFile(defaultList)?.readJson(MusicList::class.java)
-
-                if (localDefaultList != null) {
-                    defaultList.list.clear()
-                    defaultList.list.addAll(localDefaultList.list)
-                }
-            }
-
-            val localLikeList = savedTargetFile(likeList)?.readJson(MusicList::class.java)
-
-            if (localLikeList == null) {
-                map[NAME_LIKE] = false
-            } else {
-                map[NAME_LIKE] = true
-                likeList.list.clear()
-                likeList.list.addAll(localLikeList.list)
-            }
-
-            savedDirectory(true)?.listFiles { f ->
-                val musicList = f.readJson(MusicList::class.java)
-                if (musicList == null) {
-                    map[f.name] = false
-                    false
-                } else {
-                    map[musicList.name] = true
-                    myLists.add(musicList)
-                    true
-                }
-            }
-
-            it.onNext(map)
-            it.onComplete()
-        }
-    }
+//    fun readList(readDefault: Boolean): Observable<Map<String, Boolean>> {
+//        return Observable.create<Map<String, Boolean>> {
+//            val map = hashMapOf<String, Boolean>()
+//
+//            if (readDefault) {
+//                val localDefaultList = savedTargetFile(defaultList)?.readJson(MusicList::class.java)
+//
+//                if (localDefaultList != null) {
+//                    defaultList.list.clear()
+//                    defaultList.list.addAll(localDefaultList.list)
+//                }
+//            }
+//
+//            val localLikeList = savedTargetFile(likeList)?.readJson(MusicList::class.java)
+//
+//            if (localLikeList == null) {
+//                map[NAME_LIKE] = false
+//            } else {
+//                map[NAME_LIKE] = true
+//                likeList.list.clear()
+//                likeList.list.addAll(localLikeList.list)
+//            }
+//
+//            savedDirectory(true)?.listFiles { f ->
+//                val musicList = f.readJson(MusicList::class.java)
+//                if (musicList == null) {
+//                    map[f.name] = false
+//                    false
+//                } else {
+//                    map[musicList.name] = true
+//                    myLists.add(musicList)
+//                    true
+//                }
+//            }
+//
+//            it.onNext(map)
+//            it.onComplete()
+//        }
+//    }
 
     fun scan(): Observable<List<Song>> {
         return Observable.create<List<Song>> {

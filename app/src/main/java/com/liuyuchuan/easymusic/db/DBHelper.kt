@@ -147,7 +147,7 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
     }
 
     fun insertHistory(song: Song): Boolean {
-        writableDatabase.delete(TABLE_SONG, "path=?", arrayOf(song.path))
+        writableDatabase.delete(TABLE_HISTORY, "path=?", arrayOf(song.path))
         return writableDatabase.insert(TABLE_HISTORY, null, packageSong(song)) != -1L
     }
 

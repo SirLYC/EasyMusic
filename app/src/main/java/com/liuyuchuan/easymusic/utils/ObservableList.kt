@@ -11,6 +11,7 @@ class ObservableList<T>(private val realList: MutableList<T>) : AbstractMutableL
 
     fun addCallback(callback: ListUpdateCallback): Boolean = callbacks.add(callback)
     fun removeCallback(callback: ListUpdateCallback): Boolean = callbacks.remove(callback)
+    fun removeAllCallbacks() = callbacks.clear()
 
     override val size: Int
         get() = realList.size

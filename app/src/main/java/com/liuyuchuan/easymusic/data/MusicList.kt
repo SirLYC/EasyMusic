@@ -8,8 +8,6 @@ import com.liuyuchuan.easymusic.utils.ObservableList
 class MusicList(
         val name: String,
         val list: ObservableList<Song>
-
-
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

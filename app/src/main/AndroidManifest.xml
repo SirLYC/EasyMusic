@@ -28,7 +28,12 @@
         <activity
             android:name=".list.ListManageActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".play.PlayActivity"/>
+        <activity
+            android:name=".play.PlayActivity"
+            android:launchMode="singleTask"/>
+        <activity
+            android:name=".history.HistoryActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

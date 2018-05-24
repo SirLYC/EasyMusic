@@ -143,7 +143,7 @@ class LoadingDrawable(context: Context) : Drawable(), Animatable, Animator.Anima
     }
 
     private fun computeProgress(progress: Float) {
-        // Moving the start trim only occurs in the first 50% of a single ring animation
+        // Moving the prepare trim only occurs in the first 50% of a single ring animation
         if (progress <= START_TRIM_DURATION_OFFSET) {
             val startTrimProgress = progress / START_TRIM_DURATION_OFFSET
             startDegrees = originStartDegrees + MAX_SWIPE_DEGREES * MATERIAL_INTERPOLATOR.getInterpolation(startTrimProgress)
@@ -245,7 +245,7 @@ class LoadingDrawable(context: Context) : Drawable(), Animatable, Animator.Anima
         levelSwipeDegrees[1] = 0f
         levelSwipeDegrees[2] = 0f
 
-        // Log.e("LoadingDrawable", "start")
+        // Log.e("LoadingDrawable", "prepare")
         progressAnimator.start()
     }
 

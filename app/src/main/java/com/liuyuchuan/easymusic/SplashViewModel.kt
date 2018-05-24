@@ -33,25 +33,22 @@ class SplashViewModel(
                     .doOnTerminate { scanRefreshState.value = RefreshState.NotEmpty }
                     .concatMapDelayError {
                         songRepository.addSongTo("默认列表", it)
-                    }.subscribe({ }, {
+                    }
+                    .flatMap {
+                        songRepository.getHistory()
+                    }
+                    .subscribe({
+                        musicManager.playingList.addAll(it)
+                        if (musicManager.playingList.size > 0) {
+                            musicManager.playPosition = 0
+                        }
+                    }, {
                         ifDebug {
                             println(it)
                         }
                     })
                     .also { disposables.add(it) }
         }
-    }
-
-    fun readHistory() {
-        songRepository.getHistory()
-                .async()
-                .subscribe({
-                    musicManager.historyList.addAll(it)
-                }, {
-                    ifDebug {
-                        println(it)
-                    }
-                })
     }
 
     override fun onCleared() {

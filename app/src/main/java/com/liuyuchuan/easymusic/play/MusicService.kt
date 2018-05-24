@@ -79,10 +79,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 .async()
                 .subscribe({
                     // may use the result
-                    if (musicManager.historyList.contains(song)) {
-                        musicManager.historyList.remove(song)
-                    }
-                    musicManager.historyList.add(0, song)
+                    // do nothing
                 }, {
                     ifDebug {
                         println(it)
@@ -93,11 +90,18 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     override fun onCompletion(mp: MediaPlayer) {
         playState.value.pause()?.let(playState::setValue)
         disposables.clear()
-        when (playModeLiveData.value) {
+        val play = when (playModeLiveData.value) {
             PLAY_ORDER -> {
                 musicManager.playPosition++
                 if (musicManager.playPosition >= playingList.size) {
-                    musicManager.playPosition = -1
+                    if (musicManager.playingList.size > 0) {
+                        musicManager.playPosition = 0
+                    } else {
+                        musicManager.playPosition = -1
+                    }
+                    false
+                } else {
+                    false
                 }
             }
 
@@ -105,53 +109,56 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 if (++musicManager.playPosition >= playingList.size) {
                     musicManager.playPosition = 0
                 }
+                true
             }
 
             PLAY_SHUFFLE -> {
                 musicManager.playPosition = Random().nextInt(playingList.size)
+                true
             }
 
-            PLAY_SINGLE_REPEAT -> {
-                // do nothing
-            }
+            PLAY_SINGLE_REPEAT -> true
 
             else -> {
-                Log.w("MusicService", "Unknown play mode( ${playModeLiveData.value}), use single repeat mode instead")
+                Log.w("MusicService", "Unknown prepare mode( ${playModeLiveData.value}), use single repeat mode instead")
                 musicManager.playPosition++
                 if (musicManager.playPosition >= playingList.size) {
-                    musicManager.playPosition = -1
+                    if (musicManager.playingList.size > 0) {
+                        musicManager.playPosition = 0
+                    } else {
+                        musicManager.playPosition = -1
+                    }
+                    false
+                } else {
+                    false
                 }
             }
         }
 
-        play()
+        prepare(play)
     }
 
-    private fun play() {
+    private fun prepare(play: Boolean) {
         mediaPlayer.reset()
         playState.value.reset().let(playState::setValue)
         playState.value.prepare()?.let {
             playState.value = it
-            doPlay()
+            doPlay(play)
         }
     }
 
-    private fun doPlay() {
+    private fun doPlay(play: Boolean) {
         Observable.create<Optional<Song>>({
             if (musicManager.playPosition < 0 || musicManager.playPosition >= playingList.size) {
-                if (musicManager.playingList.size <= 0) {
-                    Log.d("MusicService", "cannot play, cuz playPosition = ${musicManager.playPosition} and size of playing list is 0")
-                    it.onNext(Optional.ofNullable(null))
-                    return@create
-                } else {
-                    musicManager.playPosition = 0
-                }
+                Log.d("MusicService", "cannot prepare, cuz playPosition = ${musicManager.playPosition} and size of playing list is 0")
+                it.onNext(Optional.ofNullable(null))
+                return@create
             }
 
             val song = playingList[musicManager.playPosition]
             mediaPlayer.setDataSource(song.path)
             mediaPlayer.prepare()
-            Log.d("MusicService", "play $song")
+            Log.d("MusicService", "prepare $song")
             it.onNext(Optional.of(song))
         })
                 .async()
@@ -161,11 +168,13 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                             playState.value.prepareResult(false)?.let(playState::setValue)
                         } else {
                             playState.value.prepareResult(true)?.let(playState::setValue)
-                            playState.value.play()?.let {
-                                mediaPlayer.start()
-                                playState.value = it
-                                startCountProgress()
-                                recordHistory(song)
+                            if (play) {
+                                playState.value.play()?.let {
+                                    mediaPlayer.start()
+                                    playState.value = it
+                                    startCountProgress()
+                                    recordHistory(song)
+                                }
                             }
                         }
                         playingSongLiveData.value = song
@@ -185,8 +194,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     // offer playing commands and state query
     inner class MusicBinder : Binder() {
 
-        fun start() {
-            play()
+        fun prepare(play: Boolean) {
+            this@MusicService.prepare(play)
         }
 
         fun playOrPause() {
@@ -204,7 +213,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
             }
         }
 
-        // play next by button
+        // prepare next by button
         fun playNext() {
             mediaPlayer.stop()
             disposables.clear()
@@ -222,10 +231,10 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 }
             }
 
-            play()
+            prepare(true)
         }
 
-        // play pre by button
+        // prepare pre by button
         fun playPre() {
             mediaPlayer.stop()
             disposables.clear()
@@ -243,14 +252,16 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 }
             }
 
-            play()
+            prepare(true)
         }
 
         fun playPositionAt(progress: Float) {
             val duration = mediaPlayer.duration
+            val now = (progress * duration).roundToInt()
             if (duration > 0) {
-                mediaPlayer.seekTo((progress * duration).roundToInt())
+                mediaPlayer.seekTo(now)
             }
+            playProgressLiveData.value = PlayProgress(now, duration)
         }
 
         fun changeMode() {

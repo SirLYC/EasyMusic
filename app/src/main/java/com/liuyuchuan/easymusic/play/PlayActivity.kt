@@ -8,11 +8,14 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.SeekBar
 import com.liuyuchuan.easymusic.BaseActivity
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.Song
+import com.liuyuchuan.easymusic.history.HistoryActivity
 import com.liuyuchuan.easymusic.utils.PlayState
 import com.liuyuchuan.easymusic.utils.formatTime
 import com.liuyuchuan.easymusic.utils.toast
@@ -82,6 +85,30 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_play, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.history -> {
+                startActivity(Intent(this, HistoryActivity::class.java))
+                true
+            }
+            else -> false
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        val start = intent?.getBooleanExtra(NAME_NEW_MUSIC, false) ?: false
+        if (start) {
+            intent?.putExtra(NAME_NEW_MUSIC, false)
+        }
+        musicBinder.prepare(start)
+    }
+
     override fun onClick(v: View) {
         when (v.id) {
             R.id.iv_play_next -> musicBinder.playNext()
@@ -114,8 +141,8 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
             val start = intent.getBooleanExtra(NAME_NEW_MUSIC, false)
             if (start) {
                 intent.putExtra(NAME_NEW_MUSIC, false)
-                musicBinder.start()
             }
+            musicBinder.prepare(start)
 
             musicBinder.playModeLiveData().observe(this@PlayActivity, Observer {
                 it?.let {

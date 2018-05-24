@@ -20,7 +20,7 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
     private lateinit var adapter: ReactiveAdapter
     private lateinit var listManageViewModel: ListManageViewModel
     private lateinit var songListViewModel: SongListViewModel
-    private lateinit var checkableItemViewBinder: SongItemViewBinder
+    private var checkableItemViewBinder: SongItemViewBinder? = null
 
     private var menuItemEdit: MenuItem? = null
     private var menuItemDelete: MenuItem? = null
@@ -53,8 +53,9 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
 
         adapter = ReactiveAdapter(songListViewModel.songList)
                 .apply {
-                    checkableItemViewBinder = SongItemViewBinder(this@SongListFragment)
-                    register(songCheckableItem::class.java, checkableItemViewBinder)
+                    checkableItemViewBinder = SongItemViewBinder(this@SongListFragment).apply {
+                        register(songCheckableItem::class.java, this)
+                    }
                     observe(this@SongListFragment)
                 }
 
@@ -103,17 +104,21 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
             }
 
             R.id.list_check_all -> {
-                if (checkableItemViewBinder.isCheckAll()) {
-                    checkableItemViewBinder.uncheckAll()
-                } else {
-                    checkableItemViewBinder.checkAll()
+                checkableItemViewBinder?.let { checkableItemViewBinder ->
+                    if (checkableItemViewBinder.isCheckAll()) {
+                        checkableItemViewBinder.uncheckAll()
+                    } else {
+                        checkableItemViewBinder.checkAll()
+                    }
                 }
                 true
             }
 
             R.id.list_delete -> {
-                val list = checkableItemViewBinder.checkedItemList()
-                musicList.list.removeAll(list.map { it.realItem })
+                checkableItemViewBinder?.let {
+                    val list = it.checkedItemList()
+                    musicList.list.removeAll(list.map { it.realItem })
+                }
                 true
             }
 
@@ -134,6 +139,6 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
             menuItemFinish?.isVisible = false
         }
 
-        checkableItemViewBinder.enableCheck = enable
+        checkableItemViewBinder?.enableCheck = enable
     }
 }
