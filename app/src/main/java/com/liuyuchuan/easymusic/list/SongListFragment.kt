@@ -20,7 +20,7 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
     private lateinit var adapter: ReactiveAdapter
     private lateinit var listManageViewModel: ListManageViewModel
     private lateinit var songListViewModel: SongListViewModel
-    private var checkableItemViewBinder: SongItemViewBinder? = null
+    private lateinit var checkableItemViewBinder: SongItemViewBinder
 
     private var menuItemEdit: MenuItem? = null
     private var menuItemDelete: MenuItem? = null
@@ -30,6 +30,7 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        songListViewModel = provideViewModel()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -47,15 +48,13 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
 
         musicList = list
 
-        songListViewModel = provideViewModel()
         setTitle(musicList.name)
         songListViewModel.init(musicList)
 
         adapter = ReactiveAdapter(songListViewModel.songList)
                 .apply {
-                    checkableItemViewBinder = SongItemViewBinder(this@SongListFragment).apply {
-                        register(songCheckableItem::class.java, this)
-                    }
+                    checkableItemViewBinder = SongItemViewBinder(this@SongListFragment)
+                    register(songCheckableItem::class.java, checkableItemViewBinder)
                     observe(this@SongListFragment)
                 }
 
@@ -78,7 +77,8 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
         menuItemDelete = menu.findItem(R.id.list_delete)
         menuItemCheckAll = menu.findItem(R.id.list_check_all)
         menuItemFinish = menu.findItem(R.id.list_complete)
-        listManageViewModel.enableSelectLiveData.observe(this, Observer {
+
+        songListViewModel.enableSelectLiveData.observe(this, Observer {
             enableCheckAction(it!!)
         })
     }
@@ -104,21 +104,17 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
             }
 
             R.id.list_check_all -> {
-                checkableItemViewBinder?.let { checkableItemViewBinder ->
-                    if (checkableItemViewBinder.isCheckAll()) {
-                        checkableItemViewBinder.uncheckAll()
-                    } else {
-                        checkableItemViewBinder.checkAll()
-                    }
+                if (checkableItemViewBinder.isCheckAll()) {
+                    checkableItemViewBinder.uncheckAll()
+                } else {
+                    checkableItemViewBinder.checkAll()
                 }
                 true
             }
 
             R.id.list_delete -> {
-                checkableItemViewBinder?.let {
-                    val list = it.checkedItemList()
-                    musicList.list.removeAll(list.map { it.realItem })
-                }
+                val list = checkableItemViewBinder.checkedItemList()
+                songListViewModel.songList.removeAll(list)
                 true
             }
 
@@ -139,6 +135,6 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
             menuItemFinish?.isVisible = false
         }
 
-        checkableItemViewBinder?.enableCheck = enable
+        checkableItemViewBinder.enableCheck = enable
     }
 }

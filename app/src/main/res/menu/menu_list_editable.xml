@@ -8,6 +8,13 @@
         app:showAsAction="ifRoom"/>
 
     <item
+        android:id="@+id/list_add"
+        android:title="@string/title_menu_add"
+        android:icon="@drawable/ic_add"
+        android:visible="false"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/list_check_all"
         android:title="@string/title_menu_check_all"
         android:icon="@drawable/ic_select_all"

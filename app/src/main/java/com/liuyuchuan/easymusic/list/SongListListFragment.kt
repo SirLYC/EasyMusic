@@ -21,6 +21,7 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
     private lateinit var checkableItemViewBinder: ListItemViewBinder
 
     private var menuItemEdit: MenuItem? = null
+    private var menuItemAdd: MenuItem? = null
     private var menuItemDelete: MenuItem? = null
     private var menuItemCheckAll: MenuItem? = null
     private var menuItemFinish: MenuItem? = null
@@ -80,6 +81,7 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
         menuItemDelete = menu.findItem(R.id.list_delete)
         menuItemCheckAll = menu.findItem(R.id.list_check_all)
         menuItemFinish = menu.findItem(R.id.list_complete)
+        menuItemAdd = menu.findItem(R.id.list_add)
 
         listManageViewModel.enableSelectLiveData.observe(this, Observer {
             enableCheckAction(it!!)
@@ -121,6 +123,11 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
                 true
             }
 
+            R.id.list_add -> {
+                AddListDialog.show(childFragmentManager)
+                true
+            }
+
             else -> false
         }
     }
@@ -128,11 +135,13 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
     private fun enableCheckAction(enable: Boolean) {
         if (enable) {
             menuItemEdit?.isVisible = false
+            menuItemAdd?.isVisible = false
             menuItemCheckAll?.isVisible = true
             menuItemDelete?.isVisible = true
             menuItemFinish?.isVisible = true
         } else {
             menuItemEdit?.isVisible = true
+            menuItemAdd?.isVisible = true
             menuItemCheckAll?.isVisible = false
             menuItemDelete?.isVisible = false
             menuItemFinish?.isVisible = false

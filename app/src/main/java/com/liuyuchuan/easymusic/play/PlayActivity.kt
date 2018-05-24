@@ -105,8 +105,10 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
         val start = intent?.getBooleanExtra(NAME_NEW_MUSIC, false) ?: false
         if (start) {
             intent?.putExtra(NAME_NEW_MUSIC, false)
+            musicBinder.prepare(true)
+        } else if (musicBinder.playState().value !== PlayState.Playing) {
+            musicBinder.prepare(false)
         }
-        musicBinder.prepare(start)
     }
 
     override fun onClick(v: View) {
@@ -136,11 +138,13 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
 
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             musicBinder = service as MusicService.MusicBinder
-            val start = intent.getBooleanExtra(NAME_NEW_MUSIC, false)
+            val start = intent?.getBooleanExtra(NAME_NEW_MUSIC, false) ?: false
             if (start) {
-                intent.putExtra(NAME_NEW_MUSIC, false)
+                intent?.putExtra(NAME_NEW_MUSIC, false)
+                musicBinder.prepare(true)
+            } else if (musicBinder.playState().value !== PlayState.Playing) {
+                musicBinder.prepare(false)
             }
-            musicBinder.prepare(start)
 
             musicBinder.playModeLiveData().observe(this@PlayActivity, Observer {
                 it?.let {

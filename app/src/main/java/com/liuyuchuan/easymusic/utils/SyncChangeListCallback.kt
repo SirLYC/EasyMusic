@@ -33,7 +33,7 @@ class SyncChangeListCallback<E, T>(
     override fun onInserted(position: Int, count: Int) {
         var i = 0
         while (i < count) {
-            reactList[position - offset + i] = map(observableList[position + i])
+            reactList.add(position - offset + i, map(observableList[position + i]))
             i++
         }
     }

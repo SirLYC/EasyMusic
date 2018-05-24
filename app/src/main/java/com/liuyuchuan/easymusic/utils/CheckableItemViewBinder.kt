@@ -105,7 +105,7 @@ abstract class CheckableItemViewBinder<VH : RecyclerView.ViewHolder, T> : ItemVi
         }
         adapter.items.forEachIndexed { index, item ->
             if (item is CheckableItem<*> && item.checkable) {
-                item.isChecked = true
+                item.isChecked = false
                 adapter.notifyItemChanged(index)
             }
         }

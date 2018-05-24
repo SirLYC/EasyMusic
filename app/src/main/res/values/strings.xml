@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">EasyMusic</string>
     <string name="content_welcome">欢迎使用EasyMusic</string>
+    <string name="action_ok">确定</string>
     <string name="action_cancel">取消</string>
+    <string name="error_empty_list_name">列表名不能为空</string>
 
     <string name="title_fragment_song_list_list">所有列表</string>
 
@@ -18,4 +20,5 @@
     <string name="history">历史记录</string>
     <string name="title_activity_playing_list">播放列表</string>
     <string name="title_activity_history">历史记录</string>
+    <string name="title_menu_add">添加</string>
 </resources>

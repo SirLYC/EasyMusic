@@ -12,7 +12,7 @@ import io.reactivex.internal.disposables.ListCompositeDisposable
  * Created by Liu Yuchuan on 2018/5/7.
  */
 class ListManageViewModel(
-        private val musicManager: MusicManager,
+        musicManager: MusicManager,
         private val songRepository: SongRepository
 ) : ViewModel() {
 
@@ -24,9 +24,14 @@ class ListManageViewModel(
     val listRefreshState = NonNullLiveData<RefreshState>(RefreshState.Empty)
     val listRefreshEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
 
+    val addListRefreshState = NonNullLiveData<RefreshState>(RefreshState.Empty)
+    val addListRefreshEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
+
     init {
+        SyncChangeListCallback.link(songListList, musicManager.musicListList, map = { it -> it.realItem })
         selectedMusicListLiveData.value = null
         listRefreshState.observeForever { listRefreshEvent.value = it!! }
+        addListRefreshState.observeForever { addListRefreshEvent.value = it!! }
     }
 
     fun refreshList() {
@@ -39,7 +44,11 @@ class ListManageViewModel(
                             if (list.isNotEmpty()) {
                                 songListList.clear()
                                 songListList.addAll(list.map {
-                                    CheckableItem(it)
+                                    if (it.name == "默认列表" || it.name == "喜欢") {
+                                        CheckableItem(it, false)
+                                    } else {
+                                        CheckableItem(it)
+                                    }
                                 })
                             }
                             listRefreshState.value = it
@@ -50,6 +59,31 @@ class ListManageViewModel(
                         }
 
                         listRefreshState.value.error("获取列表失败")?.let(listRefreshState::setValue)
+                    })
+                    .also { disposables.add(it) }
+        }
+    }
+
+    fun addSongList(name: String) {
+        addListRefreshState.value.refresh()?.let { nextState ->
+            addListRefreshState.value = nextState
+            songRepository.createList(name)
+                    .async()
+                    .subscribe({
+                        if (it) {
+                            addListRefreshState.value.result(false)?.let {
+                                songListList.add(CheckableItem(MusicList(name, ObservableList(mutableListOf()))))
+                                addListRefreshState.value = it
+                                addListRefreshState.value = RefreshState.Empty
+                            }
+                        } else {
+                            addListRefreshState.value.error("创建列表失败")?.let(addListRefreshState::setValue)
+                        }
+                    }, {
+                        ifDebug {
+                            it.printStackTrace()
+                        }
+                        addListRefreshState.value.error("创建列表出错")?.let(addListRefreshState::setValue)
                     })
                     .also { disposables.add(it) }
         }
