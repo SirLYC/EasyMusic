@@ -123,13 +123,18 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
 
     override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
         if (fromUser) {
-            musicBinder.playPositionAt(progress / (TOTAL_PROGRESS.toFloat()))
+            musicBinder.attemptPlayPositionAt(progress / (TOTAL_PROGRESS.toFloat()))
         }
     }
 
-    override fun onStartTrackingTouch(seekBar: SeekBar) {}
+    override fun onStartTrackingTouch(seekBar: SeekBar) {
+        musicBinder.setPostProgressUpdate(false)
+    }
 
-    override fun onStopTrackingTouch(seekBar: SeekBar) {}
+    override fun onStopTrackingTouch(seekBar: SeekBar) {
+        musicBinder.setPostProgressUpdate(true)
+        musicBinder.playPositionAt(seekBar.progress / (TOTAL_PROGRESS.toFloat()))
+    }
 
     inner class MusicConnection : ServiceConnection {
         override fun onBindingDied(name: ComponentName) {}

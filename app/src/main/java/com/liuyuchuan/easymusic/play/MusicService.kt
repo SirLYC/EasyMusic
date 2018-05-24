@@ -43,6 +43,7 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     private val playingSongLiveData = MutableLiveData<Song>()
     private val playModeLiveData = NonNullLiveData(PLAY_ALL_REPEAT)
     private val playProgressLiveData = NonNullLiveData(PlayProgress(0, 0))
+    private var postProgressUpdate = true
 
     companion object {
         const val PLAY_ORDER = 0
@@ -62,12 +63,15 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     }
 
     private fun startCountProgress() {
+        postProgressUpdate = true
         disposables.clear()
         Observable.interval(1, TimeUnit.SECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe {
-                    playProgressLiveData.value = PlayProgress(mediaPlayer.currentPosition, mediaPlayer.duration)
+                    if (postProgressUpdate) {
+                        playProgressLiveData.value = PlayProgress(mediaPlayer.currentPosition, mediaPlayer.duration)
+                    }
                 }
                 .also {
                     disposables.add(it)
@@ -80,6 +84,11 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 .subscribe({
                     // may use the result
                     // do nothing
+                    ifDebug {
+                        if (!it) {
+                            Log.w("MusicService", "record history failed ($song)")
+                        }
+                    }
                 }, {
                     ifDebug {
                         println(it)
@@ -209,6 +218,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 PlayState.ResourceReady -> playState.value.play()?.let {
                     mediaPlayer.start()
                     playState.value = it
+                    startCountProgress()
+                    playingSongLiveData.value?.let { recordHistory(it) }
                 }
             }
         }
@@ -255,6 +266,15 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
             prepare(true)
         }
 
+        fun attemptPlayPositionAt(progress: Float) {
+            val duration = mediaPlayer.duration
+            val now = (progress * duration).roundToInt()
+//            if (duration > 0) {
+//                mediaPlayer.seekTo(now)
+//            }
+            playProgressLiveData.value = PlayProgress(now, duration)
+        }
+
         fun playPositionAt(progress: Float) {
             val duration = mediaPlayer.duration
             val now = (progress * duration).roundToInt()
@@ -267,6 +287,10 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
         fun changeMode() {
             val oldMode = playModeLiveData.value
             playModeLiveData.value = (oldMode + 1) % 4
+        }
+
+        fun setPostProgressUpdate(enable: Boolean) {
+            postProgressUpdate = enable
         }
 
         fun playModeLiveData() = playModeLiveData
