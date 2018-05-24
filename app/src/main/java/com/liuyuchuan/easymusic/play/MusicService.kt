@@ -38,8 +38,6 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
 
     private val playingList = musicManager.playingList
 
-    private var playingSong: Song? = null
-
     private val playState = NonNullLiveData<PlayState>(PlayState.NotReady)
     private val playEvent = NonNullSingleLiveEvent<PlayState>(PlayState.NotReady)
     private val playingSongLiveData = MutableLiveData<Song>()
@@ -113,6 +111,10 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
                 musicManager.playPosition = Random().nextInt(playingList.size)
             }
 
+            PLAY_SINGLE_REPEAT -> {
+                // do nothing
+            }
+
             else -> {
                 Log.w("MusicService", "Unknown play mode( ${playModeLiveData.value}), use single repeat mode instead")
                 musicManager.playPosition++
@@ -137,9 +139,13 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
     private fun doPlay() {
         Observable.create<Optional<Song>>({
             if (musicManager.playPosition < 0 || musicManager.playPosition >= playingList.size) {
-                Log.d("MusicService", "cannot play, cuz playPosition = ${musicManager.playPosition}")
-                it.onNext(Optional.ofNullable(null))
-                return@create
+                if (musicManager.playingList.size <= 0) {
+                    Log.d("MusicService", "cannot play, cuz playPosition = ${musicManager.playPosition} and size of playing list is 0")
+                    it.onNext(Optional.ofNullable(null))
+                    return@create
+                } else {
+                    musicManager.playPosition = 0
+                }
             }
 
             val song = playingList[musicManager.playPosition]
