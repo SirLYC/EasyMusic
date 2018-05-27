@@ -3,9 +3,11 @@ package com.liuyuchuan.easymusic.list
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.liuyuchuan.easymusic.data.MusicList
+import com.liuyuchuan.easymusic.data.Song
 import com.liuyuchuan.easymusic.data.SongRepository
 import com.liuyuchuan.easymusic.ifDebug
 import com.liuyuchuan.easymusic.utils.*
+import io.reactivex.Observable
 import io.reactivex.internal.disposables.ListCompositeDisposable
 
 /**
@@ -19,13 +21,21 @@ class ListManageViewModel(
     private val disposables = ListCompositeDisposable()
     val selectedMusicListLiveData = MutableLiveData<MusicList>()
     val songListList = ObservableList(mutableListOf<CheckableItem<MusicList>>())
-    val enableSelectLiveData = NonNullLiveData(false)
+    val enableCheckLiveData = NonNullLiveData(false)
 
     val listRefreshState = NonNullLiveData<RefreshState>(RefreshState.Empty)
     val listRefreshEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
 
     val addListRefreshState = NonNullLiveData<RefreshState>(RefreshState.Empty)
     val addListRefreshEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
+
+    val checkedList = mutableListOf<CheckableItem<Song>>()
+
+    val addToMusicListEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
+
+    val deleteSongEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
+
+    val deleteMusicListEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
 
     init {
         SyncChangeListCallback.link(songListList, musicManager.musicListList, map = { it -> it.realItem })
@@ -89,8 +99,87 @@ class ListManageViewModel(
         }
     }
 
+    fun addToMusicList(musicList: MusicList) {
+        addToMusicListEvent.value.refresh()?.let { nextState ->
+            addToMusicListEvent.value = nextState
+            Observable.fromIterable(checkedList)
+                    .async()
+                    .concatMapDelayError {
+                        songRepository.addSongTo(musicList.name, it.realItem)
+                    }
+                    .doOnTerminate {
+                        musicList.list.addAll(musicList.list)
+                        addToMusicListEvent.value.result(false)?.let {
+                            addToMusicListEvent.value = it
+                        }
+                    }
+                    .subscribe({
+                        // do  something if need
+                    }, {
+                        ifDebug {
+                            it.printStackTrace()
+                        }
+                    })
+                    .also { disposables.add(it) }
+        }
+    }
+
+    fun deleteSongsFromList(musicList: MusicList) {
+        deleteSongEvent.value.refresh()?.let { nextState ->
+            deleteSongEvent.value = nextState
+            Observable.fromIterable(checkedList)
+                    .async()
+                    .concatMapDelayError {
+                        songRepository.deleteSong(musicList.name, it.realItem)
+                    }
+                    .doOnTerminate {
+                        musicList.list.addAll(musicList.list)
+                        deleteSongEvent.value.result(false)?.let(deleteSongEvent::setValue)
+                    }
+                    .subscribe({
+                        // do  something if need
+                    }, {
+                        ifDebug {
+                            it.printStackTrace()
+                        }
+                    }).also { disposables.add(it) }
+        }
+    }
+
+    fun deleteSongLists(list: List<CheckableItem<MusicList>>) {
+        deleteMusicListEvent.value.refresh()?.let { nextState ->
+            deleteMusicListEvent.value = nextState
+            Observable.fromIterable(list)
+                    .async()
+                    .concatMapDelayError {
+                        songRepository.deleteList(it.realItem.name)
+                    }
+                    .doOnTerminate {
+                        songListList.removeAll(list)
+                        deleteMusicListEvent.value.result(false)?.let(deleteMusicListEvent::setValue)
+                    }
+                    .subscribe({
+                        // do  something if need
+                    }, {
+                        ifDebug {
+                            it.printStackTrace()
+                        }
+                    }).also { disposables.add(it) }
+        }
+    }
+
+    fun isBusyOnMusicList(): Boolean {
+        return addToMusicListEvent.value is RefreshState.Refreshing
+                || deleteSongEvent.value is RefreshState.Refreshing
+    }
+
+    fun isBusyOnAllList(): Boolean {
+        return deleteMusicListEvent.value is RefreshState.Refreshing
+                || addListRefreshState.value is RefreshState.Refreshing
+    }
+
     fun enableCheck(enable: Boolean) {
-        enableSelectLiveData.value = enable
+        enableCheckLiveData.value = enable
     }
 
     override fun onCleared() {

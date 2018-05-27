@@ -65,6 +65,14 @@ class SongListListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemC
                 is RefreshState.Error -> toast(it.msg)
             }
         })
+
+        listManageViewModel.deleteMusicListEvent.observe(this, Observer {
+            when (it) {
+                is RefreshState.NotEmpty -> {
+                    listManageViewModel.enableCheckLiveData.value = false
+                }
+            }
+        })
     }
 
 
@@ -84,7 +92,7 @@ class SongListListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemC
         menuItemFinish = menu.findItem(R.id.list_complete)
         menuItemAdd = menu.findItem(R.id.list_add)
 
-        listManageViewModel.enableSelectLiveData.observe(this, Observer {
+        listManageViewModel.enableCheckLiveData.observe(this, Observer {
             enableCheckAction(it!!)
         })
     }
@@ -119,8 +127,16 @@ class SongListListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemC
             }
 
             R.id.list_delete -> {
+                if (listManageViewModel.isBusyOnAllList()) {
+                    return true
+                }
+
                 val list = checkableItemViewBinder.checkedItemList()
-                listManageViewModel.songListList.removeAll(list)
+                if (list.isEmpty()) {
+                    toast(R.string.error_no_lists_checked)
+                } else {
+                    listManageViewModel.deleteSongLists(list)
+                }
                 true
             }
 

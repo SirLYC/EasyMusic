@@ -44,7 +44,11 @@ class SongListViewModel(
         musicManager.playPosition = index
     }
 
-    fun addSongToPlayList(song: Song) {
-        musicManager.playingList.add(song)
+    fun addListToPlayList(list: List<CheckableItem<Song>>) {
+        musicManager.playingList.addAll(list.map(CheckableItem<Song>::realItem))
     }
+
+//    fun addSongToPlayList(song: Song) {
+//        musicManager.playingList.add(song)
+//    }
 }

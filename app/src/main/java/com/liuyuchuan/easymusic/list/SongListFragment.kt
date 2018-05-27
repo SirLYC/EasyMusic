@@ -26,10 +26,13 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
     private var menuItemDelete: MenuItem? = null
     private var menuItemCheckAll: MenuItem? = null
     private var menuItemFinish: MenuItem? = null
+    private var menuItemAddToList: MenuItem? = null
+    private var menuItemAddToPlayList: MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        listManageViewModel = activity!!.provideViewModel()
         songListViewModel = provideViewModel()
     }
 
@@ -38,7 +41,6 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        listManageViewModel = activity!!.provideViewModel()
         val list = listManageViewModel.selectedMusicListLiveData.value
         if (list == null) {
             toast(R.string.error_read_list_error)
@@ -60,6 +62,23 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
 
         rv_song_list.adapter = adapter
         rv_song_list.layoutManager = LinearLayoutManager(context)
+
+        listManageViewModel.addToMusicListEvent.observe(this, Observer {
+            when (it) {
+                is RefreshState.NotEmpty -> {
+                    AddToMusicListDialog.dismiss(childFragmentManager)
+                    songListViewModel.enableSelectLiveData.value = false
+                }
+            }
+        })
+
+        listManageViewModel.deleteSongEvent.observe(this, Observer {
+            when (it) {
+                is RefreshState.NotEmpty -> {
+                    songListViewModel.enableSelectLiveData.value = false
+                }
+            }
+        })
     }
 
     override fun onCheckRealItemClicked(realItem: Song) {
@@ -77,6 +96,8 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
         menuItemDelete = menu.findItem(R.id.list_delete)
         menuItemCheckAll = menu.findItem(R.id.list_check_all)
         menuItemFinish = menu.findItem(R.id.list_complete)
+        menuItemAddToList = menu.findItem(R.id.list_add_to_music_list)
+        menuItemAddToPlayList = menu.findItem(R.id.list_add_to_play_list)
 
         songListViewModel.enableSelectLiveData.observe(this, Observer {
             enableCheckAction(it!!)
@@ -88,6 +109,8 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
         menuItemDelete = null
         menuItemCheckAll = null
         menuItemFinish = null
+        menuItemAddToList = null
+        menuItemAddToPlayList = null
         super.onDestroyOptionsMenu()
     }
 
@@ -113,8 +136,40 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
             }
 
             R.id.list_delete -> {
+                if (listManageViewModel.isBusyOnMusicList()) {
+                    return true
+                }
                 val list = checkableItemViewBinder.checkedItemList()
-                songListViewModel.songList.removeAll(list)
+                if (list.isEmpty()) {
+                    toast(R.string.error_no_songs_checked)
+                } else {
+                    listManageViewModel.checkedList.clear()
+                    listManageViewModel.checkedList.addAll(list)
+                    listManageViewModel.deleteSongsFromList(musicList)
+                }
+                true
+            }
+
+            R.id.list_add_to_music_list -> {
+                val list = checkableItemViewBinder.checkedItemList()
+                if (list.isEmpty()) {
+                    toast(R.string.error_no_songs_checked)
+                } else {
+                    listManageViewModel.checkedList.clear()
+                    listManageViewModel.checkedList.addAll(list)
+                    AddToMusicListDialog.show(childFragmentManager)
+                }
+                true
+            }
+
+            R.id.list_add_to_play_list -> {
+                val list = checkableItemViewBinder.checkedItemList()
+                if (list.isEmpty()) {
+                    toast(R.string.error_no_songs_checked)
+                } else {
+                    songListViewModel.addListToPlayList(list)
+                    songListViewModel.enableSelectLiveData.value = false
+                }
                 true
             }
 
@@ -128,11 +183,15 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
             menuItemCheckAll?.isVisible = true
             menuItemDelete?.isVisible = true
             menuItemFinish?.isVisible = true
+            menuItemAddToList?.isVisible = true
+            menuItemAddToPlayList?.isVisible = true
         } else {
             menuItemEdit?.isVisible = true
             menuItemCheckAll?.isVisible = false
             menuItemDelete?.isVisible = false
             menuItemFinish?.isVisible = false
+            menuItemAddToList?.isVisible = false
+            menuItemAddToPlayList?.isVisible = false
         }
 
         checkableItemViewBinder.enableCheck = enable

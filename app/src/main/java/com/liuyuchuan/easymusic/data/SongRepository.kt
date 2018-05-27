@@ -33,7 +33,7 @@ class SongRepository(
         return Observable.just(dbHelper.insertSongToList(listName, song))
     }
 
-    fun deleteSing(listName: String, song: Song): Observable<Boolean> {
+    fun deleteSong(listName: String, song: Song): Observable<Boolean> {
         return Observable.just(dbHelper.deleteSong(listName, song))
     }
 
