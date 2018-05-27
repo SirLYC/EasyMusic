@@ -13,46 +13,27 @@ import com.liuyuchuan.easymusic.utils.CheckableItemViewBinder
  * Created by Liu Yuchuan on 2018/5/9.
  */
 class ListItemViewBinder(
-        private val onListItemClickListener: OnListItemClickListener
-) : CheckableItemViewBinder<ListItemViewBinder.ViewHolder, MusicList>() {
+        onRealItemClickListener: OnRealItemClickListener<MusicList>
+) : CheckableItemViewBinder<MusicList, ListItemViewBinder.ViewHolder>(onRealItemClickListener) {
     override fun onCreateRealView(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
         return inflater.inflate(R.layout.item_list, parent, true)
-                .let { ViewHolder(it, onListItemClickListener) }
+                .let { ViewHolder(it) }
     }
 
     override fun onBindRealViewHolder(holder: ViewHolder, item: MusicList) {
-        holder.bind(item, enableCheck)
+        holder.bind(item)
     }
 
-    class ViewHolder(itemView: View,
-            private val onListItemClickListener: OnListItemClickListener) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        override fun onClick(v: View) {
-            when (v) {
-                itemView -> if (!enableCheck) {
-                    musicList?.let(onListItemClickListener::onSongListItemClick)
-                }
-            }
-        }
-
-        private var enableCheck = false
         private var musicList: MusicList? = null
         private val info: TextView = itemView.findViewById(R.id.tv_info_item_list)
 
-        init {
-            itemView.setOnClickListener(this)
-        }
 
-        fun bind(item: MusicList, enableCheck: Boolean) {
+        fun bind(item: MusicList) {
             this.musicList = item
-            this.enableCheck = enableCheck
             info.text = ("${item.name}\n" +
                     "song count: ${item.list.size}\n")
         }
     }
-
-    interface OnListItemClickListener {
-        fun onSongListItemClick(item: MusicList)
-    }
-
 }

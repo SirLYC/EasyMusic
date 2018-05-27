@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_song_list.*
 /**
  * Created by Liu Yuchuan on 2018/5/7.
  */
-class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListener {
+class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClickListener<Song> {
     private lateinit var musicList: MusicList
     private lateinit var adapter: ReactiveAdapter
     private lateinit var listManageViewModel: ListManageViewModel
@@ -62,8 +62,8 @@ class SongListFragment : BaseFragment(), SongItemViewBinder.OnSongItemClickListe
         rv_song_list.layoutManager = LinearLayoutManager(context)
     }
 
-    override fun onSongItemClick(item: Song) {
-        songListViewModel.chooseSongToPlay(item)
+    override fun onCheckRealItemClicked(realItem: Song) {
+        songListViewModel.chooseSongToPlay(realItem)
         PlayActivity.start(activity!!, true)
     }
 

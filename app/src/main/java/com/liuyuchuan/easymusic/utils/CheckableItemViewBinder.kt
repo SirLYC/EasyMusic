@@ -13,7 +13,9 @@ import me.drakeet.multitype.ItemViewBinder
 /**
  * Created by Liu Yuchuan on 2018/5/9.
  */
-abstract class CheckableItemViewBinder<VH : RecyclerView.ViewHolder, T> : ItemViewBinder<CheckableItem<T>, CheckableItemViewBinder.ViewHolder<T, VH>>() {
+abstract class CheckableItemViewBinder<T, VH : RecyclerView.ViewHolder>(
+        private val onRealItemClickListener: OnRealItemClickListener<T>
+) : ItemViewBinder<CheckableItem<T>, CheckableItemViewBinder.ViewHolder<T, VH>>() {
 
     var enableCheck = false
         set(value) {
@@ -30,7 +32,7 @@ abstract class CheckableItemViewBinder<VH : RecyclerView.ViewHolder, T> : ItemVi
 
     override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder<T, VH> {
         return inflater.inflate(R.layout.item_checkable, parent, false).let {
-            ViewHolder(it, onCreateRealView(inflater, it.container_real_item))
+            ViewHolder(it, onCreateRealView(inflater, it.container_real_item), onRealItemClickListener)
         }
     }
 
@@ -44,21 +46,23 @@ abstract class CheckableItemViewBinder<VH : RecyclerView.ViewHolder, T> : ItemVi
     abstract fun onBindRealViewHolder(holder: VH, item: T)
 
     class ViewHolder<in T, out VH>(view: View,
-            val realHolder: VH) : RecyclerView.ViewHolder(view),
-            CompoundButton.OnCheckedChangeListener {
+            val realHolder: VH,
+            private val onRealItemClickListener: OnRealItemClickListener<T>) : RecyclerView.ViewHolder(view),
+            CompoundButton.OnCheckedChangeListener, View.OnClickListener {
 
         private val checkBox: AppCompatCheckBox = itemView.findViewById(R.id.accb_selectable_item)
         private var checkableItem: CheckableItem<T>? = null
-        private var enableSelect = false
+        private var enableCheck = false
 
         init {
             checkBox.setOnCheckedChangeListener(this)
+            itemView.setOnClickListener(this)
         }
 
-        fun bind(checkableItem: CheckableItem<T>, enableSelect: Boolean) {
+        fun bind(checkableItem: CheckableItem<T>, enableCheck: Boolean) {
             this.checkableItem = checkableItem
-            this.enableSelect = enableSelect
-            if (checkableItem.checkable && enableSelect) {
+            this.enableCheck = enableCheck
+            if (checkableItem.checkable && enableCheck) {
                 checkBox.visibility = View.VISIBLE
                 checkBox.isChecked = checkableItem.isChecked
             } else {
@@ -70,6 +74,16 @@ abstract class CheckableItemViewBinder<VH : RecyclerView.ViewHolder, T> : ItemVi
 
         override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
             checkableItem?.isChecked = isChecked
+        }
+
+        override fun onClick(v: View) {
+            when (v) {
+                itemView -> if (enableCheck) {
+                    checkBox.performClick()
+                } else {
+                    checkableItem?.realItem?.let(onRealItemClickListener::onCheckRealItemClicked)
+                }
+            }
         }
     }
 
@@ -125,5 +139,9 @@ abstract class CheckableItemViewBinder<VH : RecyclerView.ViewHolder, T> : ItemVi
         }
 
         return list
+    }
+
+    interface OnRealItemClickListener<in T> {
+        fun onCheckRealItemClicked(realItem: T)
     }
 }

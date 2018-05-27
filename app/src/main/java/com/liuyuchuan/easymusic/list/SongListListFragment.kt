@@ -15,7 +15,7 @@ import me.drakeet.multitype.MultiTypeAdapter
 /**
  * Created by Liu Yuchuan on 2018/5/7.
  */
-class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickListener, SwipeRefreshLayout.OnRefreshListener {
+class SongListListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClickListener<MusicList>, SwipeRefreshLayout.OnRefreshListener {
     private lateinit var listManageViewModel: ListManageViewModel
     private lateinit var adapter: MultiTypeAdapter
     private lateinit var checkableItemViewBinder: ListItemViewBinder
@@ -67,8 +67,9 @@ class SongListListFragment : BaseFragment(), ListItemViewBinder.OnListItemClickL
         })
     }
 
-    override fun onSongListItemClick(item: MusicList) {
-        listManageViewModel.selectedMusicListLiveData.value = item
+
+    override fun onCheckRealItemClicked(realItem: MusicList) {
+        listManageViewModel.selectedMusicListLiveData.value = realItem
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
