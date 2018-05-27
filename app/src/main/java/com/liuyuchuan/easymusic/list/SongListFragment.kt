@@ -67,7 +67,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
             when (it) {
                 is RefreshState.NotEmpty -> {
                     AddToMusicListDialog.dismiss(childFragmentManager)
-                    songListViewModel.enableSelectLiveData.value = false
+                    songListViewModel.enableCheckLiveData.value = false
                 }
             }
         })
@@ -75,7 +75,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
         listManageViewModel.deleteSongEvent.observe(this, Observer {
             when (it) {
                 is RefreshState.NotEmpty -> {
-                    songListViewModel.enableSelectLiveData.value = false
+                    songListViewModel.enableCheckLiveData.value = false
                 }
             }
         })
@@ -99,7 +99,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
         menuItemAddToList = menu.findItem(R.id.list_add_to_music_list)
         menuItemAddToPlayList = menu.findItem(R.id.list_add_to_play_list)
 
-        songListViewModel.enableSelectLiveData.observe(this, Observer {
+        songListViewModel.enableCheckLiveData.observe(this, Observer {
             enableCheckAction(it!!)
         })
     }
@@ -168,13 +168,22 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
                     toast(R.string.error_no_songs_checked)
                 } else {
                     songListViewModel.addListToPlayList(list)
-                    songListViewModel.enableSelectLiveData.value = false
+                    songListViewModel.enableCheckLiveData.value = false
                 }
                 true
             }
 
             else -> false
         }
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (songListViewModel.enableCheckLiveData.value) {
+            songListViewModel.enableCheckLiveData.value = false
+            return true
+        }
+
+        return false
     }
 
     private fun enableCheckAction(enable: Boolean) {

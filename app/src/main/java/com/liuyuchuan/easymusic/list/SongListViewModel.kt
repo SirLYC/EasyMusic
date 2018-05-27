@@ -14,7 +14,7 @@ class SongListViewModel(
     private lateinit var musicList: MusicList
 
     val songList = ObservableList(mutableListOf<CheckableItem<Song>>())
-    val enableSelectLiveData = NonNullLiveData(false)
+    val enableCheckLiveData = NonNullLiveData(false)
 
     fun init(musicList: MusicList) {
         songList.removeAllCallbacks()
@@ -28,7 +28,7 @@ class SongListViewModel(
     }
 
     fun enableCheck(enable: Boolean) {
-        enableSelectLiveData.value = enable
+        enableCheckLiveData.value = enable
     }
 
     fun chooseSongToPlay(song: Song) {

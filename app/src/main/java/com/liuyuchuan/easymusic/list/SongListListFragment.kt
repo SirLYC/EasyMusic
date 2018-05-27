@@ -105,6 +105,15 @@ class SongListListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemC
         super.onDestroyOptionsMenu()
     }
 
+    override fun onBackPressed(): Boolean {
+        if (listManageViewModel.enableCheckLiveData.value) {
+            listManageViewModel.enableCheckLiveData.value = false
+            return true
+        }
+
+        return false
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.list_edit -> {

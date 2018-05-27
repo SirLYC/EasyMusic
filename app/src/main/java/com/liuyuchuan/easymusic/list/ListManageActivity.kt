@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.liuyuchuan.easymusic.BaseActivity
+import com.liuyuchuan.easymusic.BaseFragment
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.play.PlayActivity
@@ -58,11 +59,17 @@ class ListManageActivity : BaseActivity(), View.OnClickListener {
     }
 
     override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-            listManageViewModel.selectedMusicListLiveData.value = null
-        } else {
-            super.onBackPressed()
+
+        val f = supportFragmentManager.fragments.firstOrNull() as? BaseFragment
+        val handled = f != null && f.onBackPressed()
+
+        if (!handled) {
+            if (supportFragmentManager.backStackEntryCount > 0) {
+                supportFragmentManager.popBackStack()
+                listManageViewModel.selectedMusicListLiveData.value = null
+            } else {
+                super.onBackPressed()
+            }
         }
     }
 
