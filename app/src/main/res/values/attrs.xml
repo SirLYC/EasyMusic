@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <declare-styleable name="RefreshStateView">
-        <attr name="textSize" format="dimension"/>
-        <attr name="ringSize" format="dimension"/>
-    </declare-styleable>
-</resources>

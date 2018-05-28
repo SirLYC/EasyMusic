@@ -8,7 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper
 import com.liuyuchuan.easymusic.SORT_DEFAULT
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.data.Song
+import com.liuyuchuan.easymusic.getSongComparator
 import com.liuyuchuan.easymusic.utils.ObservableList
+import java.util.*
 
 /**
  * Created by Liu Yuchuan on 2018/5/17.
@@ -137,6 +139,11 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
                     list.add(song)
                 } while (cursor.moveToNext())
             }
+        }
+
+        songList.forEach { list ->
+            getSortMethod(list.name).let { getSongComparator(it) }
+                    .let { Collections.sort(list.list, it) }
         }
 
         return songList

@@ -13,6 +13,7 @@ import com.liuyuchuan.easymusic.utils.ReactiveAdapter
 import com.liuyuchuan.easymusic.utils.RefreshState
 import com.liuyuchuan.easymusic.utils.provideViewModel
 import com.liuyuchuan.easymusic.utils.toast
+import com.liuyuchuan.easymusic.widget.LinearItemDivider
 import kotlinx.android.synthetic.main.activity_history.*
 import me.drakeet.multitype.MultiTypeAdapter
 
@@ -44,6 +45,7 @@ class HistoryActivity : BaseActivity(), View.OnClickListener,
 
         rv_history.adapter = adapter
         rv_history.layoutManager = LinearLayoutManager(this)
+        rv_history.addItemDecoration(LinearItemDivider(this))
 
         historyViewModel.refreshState.observe(this, Observer {
             when (it) {

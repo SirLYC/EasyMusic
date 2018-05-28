@@ -5,7 +5,6 @@ import android.provider.MediaStore
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.data.Song
 import io.reactivex.Observable
-import java.io.File
 
 
 /**
@@ -15,88 +14,12 @@ class MusicManager(
         context: Context
 ) {
 
-    companion object {
-        private const val NAME_DEFAULT = "default"
-        private const val NAME_LIKE = "like"
-        private const val NAME_DIR = "list"
-        private const val INDEX_DEFAULT = 0
-        private const val INDEX_LIKE = 1
-    }
-
     private val appContext = context.applicationContext
 
     val playingList = ObservableList<Song>(mutableListOf())
     var playPosition = -1
 
     val musicListList = ObservableList(mutableListOf<MusicList>())
-
-    val defaultList = MusicList(NAME_DEFAULT, ObservableList(mutableListOf()))
-    val likeList = MusicList(NAME_LIKE, ObservableList(mutableListOf()))
-    val myLists = ObservableList(mutableListOf<MusicList>())
-//    val historyList = ObservableList(mutableListOf<Song>())
-
-    private fun savedDirectory(editable: Boolean = false) = appContext.cacheDir.let {
-        File(it, NAME_DIR)
-    }.checkDir()?.let {
-        if (!editable) {
-            it
-        } else {
-            File(it, "myLists")
-        }
-    }
-
-    private fun savedTargetFile(musicList: MusicList) = savedDirectory(true)?.let {
-        File(it, musicList.name)
-    }
-
-    // work on worker thread
-    // try best to cache the list
-    // cannot assure 100% saved
-//    @WorkerThread
-//    @Synchronized
-//    fun saveList(musicList: MusicList) {
-//        savedTargetFile(musicList)?.writeJson(musicList)
-//    }
-
-//    fun readList(readDefault: Boolean): Observable<Map<String, Boolean>> {
-//        return Observable.create<Map<String, Boolean>> {
-//            val map = hashMapOf<String, Boolean>()
-//
-//            if (readDefault) {
-//                val localDefaultList = savedTargetFile(defaultList)?.readJson(MusicList::class.java)
-//
-//                if (localDefaultList != null) {
-//                    defaultList.list.clear()
-//                    defaultList.list.addAll(localDefaultList.list)
-//                }
-//            }
-//
-//            val localLikeList = savedTargetFile(likeList)?.readJson(MusicList::class.java)
-//
-//            if (localLikeList == null) {
-//                map[NAME_LIKE] = false
-//            } else {
-//                map[NAME_LIKE] = true
-//                likeList.list.clear()
-//                likeList.list.addAll(localLikeList.list)
-//            }
-//
-//            savedDirectory(true)?.listFiles { f ->
-//                val musicList = f.readJson(MusicList::class.java)
-//                if (musicList == null) {
-//                    map[f.name] = false
-//                    false
-//                } else {
-//                    map[musicList.name] = true
-//                    myLists.add(musicList)
-//                    true
-//                }
-//            }
-//
-//            it.onNext(map)
-//            it.onComplete()
-//        }
-//    }
 
     fun scan(): Observable<List<Song>> {
         return Observable.create<List<Song>> {

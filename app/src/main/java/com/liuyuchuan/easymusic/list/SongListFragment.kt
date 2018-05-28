@@ -10,6 +10,7 @@ import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.data.Song
 import com.liuyuchuan.easymusic.play.PlayActivity
 import com.liuyuchuan.easymusic.utils.*
+import com.liuyuchuan.easymusic.widget.LinearItemDivider
 import kotlinx.android.synthetic.main.fragment_song_list.*
 
 /**
@@ -22,6 +23,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
     private lateinit var songListViewModel: SongListViewModel
     private lateinit var checkableItemViewBinder: SongItemViewBinder
 
+    private var menuItemSort: MenuItem? = null
     private var menuItemEdit: MenuItem? = null
     private var menuItemDelete: MenuItem? = null
     private var menuItemCheckAll: MenuItem? = null
@@ -62,6 +64,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
 
         rv_song_list.adapter = adapter
         rv_song_list.layoutManager = LinearLayoutManager(context)
+        rv_song_list.addItemDecoration(LinearItemDivider(context!!))
 
         listManageViewModel.addToMusicListEvent.observe(this, Observer {
             when (it) {
@@ -72,7 +75,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
             }
         })
 
-        listManageViewModel.deleteSongEvent.observe(this, Observer {
+        songListViewModel.deleteSongEvent.observe(this, Observer {
             when (it) {
                 is RefreshState.NotEmpty -> {
                     songListViewModel.enableCheckLiveData.value = false
@@ -92,6 +95,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
+        menuItemSort = menu.findItem(R.id.list_sort)
         menuItemEdit = menu.findItem(R.id.list_edit)
         menuItemDelete = menu.findItem(R.id.list_delete)
         menuItemCheckAll = menu.findItem(R.id.list_check_all)
@@ -116,6 +120,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
         menuItemFinish = null
         menuItemAddToList = null
         menuItemAddToPlayList = null
+        menuItemSort = null
         super.onDestroyOptionsMenu()
     }
 
@@ -150,7 +155,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
                 } else {
                     listManageViewModel.checkedList.clear()
                     listManageViewModel.checkedList.addAll(list)
-                    listManageViewModel.deleteSongsFromList(musicList)
+                    songListViewModel.deleteSongsFromList(list)
                 }
                 true
             }
@@ -178,6 +183,11 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
                 true
             }
 
+            R.id.list_sort -> {
+                UpdateSortMethodDialog.show(childFragmentManager)
+                true
+            }
+
             else -> false
         }
     }
@@ -193,6 +203,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
 
     private fun enableCheckAction(enable: Boolean) {
         if (enable) {
+            menuItemSort?.isVisible = false
             menuItemEdit?.isVisible = false
             menuItemCheckAll?.isVisible = true
             menuItemDelete?.isVisible = true
@@ -200,6 +211,7 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
             menuItemAddToList?.isVisible = true
             menuItemAddToPlayList?.isVisible = true
         } else {
+            menuItemSort?.isVisible = true
             menuItemEdit?.isVisible = true
             menuItemCheckAll?.isVisible = false
             menuItemDelete?.isVisible = false

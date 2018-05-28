@@ -10,6 +10,7 @@ import com.liuyuchuan.easymusic.BaseActivity
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.Song
 import com.liuyuchuan.easymusic.utils.*
+import com.liuyuchuan.easymusic.widget.LinearItemDivider
 import kotlinx.android.synthetic.main.activity_playing_list.*
 import me.drakeet.multitype.MultiTypeAdapter
 
@@ -47,6 +48,7 @@ class PlayingListActivity : BaseActivity(), View.OnClickListener, CheckableItemV
 
         rv_playing_list.adapter = adapter
         rv_playing_list.layoutManager = LinearLayoutManager(this)
+        rv_playing_list.addItemDecoration(LinearItemDivider(this))
     }
 
     override fun onClick(v: View) {
@@ -106,6 +108,7 @@ class PlayingListActivity : BaseActivity(), View.OnClickListener, CheckableItemV
                     toast(R.string.error_no_songs_checked)
                 } else {
                     playingViewModel.playList.removeAll(list)
+                    playingViewModel.enableCheck(false)
                 }
                 true
             }

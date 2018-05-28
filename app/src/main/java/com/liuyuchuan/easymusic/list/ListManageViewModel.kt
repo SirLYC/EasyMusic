@@ -33,8 +33,6 @@ class ListManageViewModel(
 
     val addToMusicListEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
 
-    val deleteSongEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
-
     val deleteMusicListEvent = NonNullSingleLiveEvent<RefreshState>(RefreshState.Empty)
 
     init {
@@ -126,30 +124,6 @@ class ListManageViewModel(
         }
     }
 
-    fun deleteSongsFromList(musicList: MusicList) {
-        deleteSongEvent.value.refresh()?.let { nextState ->
-            deleteSongEvent.value = nextState
-            Observable.fromIterable(checkedList)
-                    .async()
-                    .concatMapDelayError {
-                        songRepository.deleteSong(musicList.name, it.realItem)
-                    }
-                    .doOnTerminate {
-                        musicList.list.removeAll(checkedList.map {
-                            it.realItem
-                        })
-                        deleteSongEvent.value.result(false)?.let(deleteSongEvent::setValue)
-                    }
-                    .subscribe({
-                        // do  something if need
-                    }, {
-                        ifDebug {
-                            it.printStackTrace()
-                        }
-                    }).also { disposables.add(it) }
-        }
-    }
-
     fun deleteSongLists(list: List<CheckableItem<MusicList>>) {
         deleteMusicListEvent.value.refresh()?.let { nextState ->
             deleteMusicListEvent.value = nextState
@@ -174,7 +148,6 @@ class ListManageViewModel(
 
     fun isBusyOnMusicList(): Boolean {
         return addToMusicListEvent.value is RefreshState.Refreshing
-                || deleteSongEvent.value is RefreshState.Refreshing
     }
 
     fun isBusyOnAllList(): Boolean {

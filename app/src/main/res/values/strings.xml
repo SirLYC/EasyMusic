@@ -25,4 +25,5 @@
     <string name="error_no_songs_checked">未选择歌曲</string>
     <string name="title_add_to_play_list">添加到播放列表</string>
     <string name="error_no_lists_checked">未选中列表项</string>
+    <string name="title_menu_sort">排序</string>
 </resources>

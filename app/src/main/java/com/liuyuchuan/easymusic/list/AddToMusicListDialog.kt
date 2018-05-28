@@ -11,6 +11,7 @@ import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.utils.ReactiveAdapter
 import com.liuyuchuan.easymusic.utils.musicListCheckableItem
 import com.liuyuchuan.easymusic.utils.provideViewModel
+import com.liuyuchuan.easymusic.widget.LinearItemDivider
 
 /**
  * Created by Liu Yuchuan on 2018/5/27.
@@ -57,6 +58,7 @@ class AddToMusicListDialog : DialogFragment(), DialogListItemViewBinder.OnMusicL
 
         v.adapter = adapter
         v.layoutManager = LinearLayoutManager(ctx)
+        v.addItemDecoration(LinearItemDivider(ctx))
 
         return AlertDialog.Builder(ctx)
                 .setTitle("添加到...")

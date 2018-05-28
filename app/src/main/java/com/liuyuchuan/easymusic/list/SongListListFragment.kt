@@ -9,6 +9,7 @@ import com.liuyuchuan.easymusic.BaseFragment
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.MusicList
 import com.liuyuchuan.easymusic.utils.*
+import com.liuyuchuan.easymusic.widget.LinearItemDivider
 import kotlinx.android.synthetic.main.fragment_song_list_list.*
 import me.drakeet.multitype.MultiTypeAdapter
 
@@ -47,6 +48,7 @@ class SongListListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemC
 
         rv_song_list_list.adapter = adapter
         rv_song_list_list.layoutManager = LinearLayoutManager(context)
+        rv_song_list_list.addItemDecoration(LinearItemDivider(context!!))
         srl_song_list_list.setOnRefreshListener(this)
 
         listManageViewModel.listRefreshState.observe(this, Observer {

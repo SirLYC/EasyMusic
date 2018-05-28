@@ -24,7 +24,7 @@ class Injection(app: Application) : ViewModelProvider.AndroidViewModelFactory(ap
             when {
                 isAssignableFrom(SplashViewModel::class.java) -> SplashViewModel(musicManager, songRepository)
                 isAssignableFrom(ListManageViewModel::class.java) -> ListManageViewModel(musicManager, songRepository)
-                isAssignableFrom(SongListViewModel::class.java) -> SongListViewModel(musicManager)
+                isAssignableFrom(SongListViewModel::class.java) -> SongListViewModel(musicManager, songRepository)
                 isAssignableFrom(HistoryViewModel::class.java) -> HistoryViewModel(songRepository, musicManager)
                 isAssignableFrom(PlayingListViewModel::class.java) -> PlayingListViewModel(musicManager)
                 else -> super.create(modelClass)
