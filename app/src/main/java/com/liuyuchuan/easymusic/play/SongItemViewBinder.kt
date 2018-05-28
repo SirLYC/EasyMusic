@@ -7,33 +7,28 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.Song
-import me.drakeet.multitype.ItemViewBinder
+import com.liuyuchuan.easymusic.utils.CheckableItemViewBinder
 
 /**
  * Created by Liu Yuchuan on 2018/5/10.
  */
 class PlaySongItemViewBinder(
-        private val onSongItemClickListener: OnSongItemClickListener
-) : ItemViewBinder<Song, PlaySongItemViewBinder.ViewHolder>() {
+        onRealItemClickListener: OnRealItemClickListener<Song>
+) : CheckableItemViewBinder<Song, PlaySongItemViewBinder.ViewHolder>(onRealItemClickListener) {
 
-    override fun onCreateViewHolder(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
-        return inflater.inflate(R.layout.item_song, parent, false)
-                .let { ViewHolder(it, onSongItemClickListener) }
+    override fun onCreateRealView(inflater: LayoutInflater, parent: ViewGroup): ViewHolder {
+        return inflater.inflate(R.layout.item_song, parent, true)
+                .let { ViewHolder(it) }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, item: Song) {
+    override fun onBindRealViewHolder(holder: ViewHolder, item: Song) {
         holder.bind(item)
     }
 
-    class ViewHolder(itemView: View,
-            private val onSongItemClickListener: OnSongItemClickListener) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val info: TextView = itemView.findViewById(R.id.tv_song_info)
 
         private var song: Song? = null
-
-        init {
-            itemView.setOnClickListener(this)
-        }
 
         fun bind(item: Song) {
             this.song = item
@@ -43,15 +38,5 @@ class PlaySongItemViewBinder(
                         "duration:$duration"
             }
         }
-
-        override fun onClick(v: View) {
-            when (v) {
-                itemView -> song?.let(onSongItemClickListener::onSongItemClick)
-            }
-        }
-    }
-
-    interface OnSongItemClickListener {
-        fun onSongItemClick(item: Song)
     }
 }

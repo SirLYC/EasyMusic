@@ -19,9 +19,6 @@ class SplashViewModel(
     val scanRefreshState = NonNullLiveData<RefreshState>(RefreshState.Empty)
     private val disposables = ListCompositeDisposable()
 
-    init {
-    }
-
     fun scan() {
         scanRefreshState.value.refresh()?.let { nextState ->
             scanRefreshState.value = nextState
@@ -38,9 +35,12 @@ class SplashViewModel(
                         songRepository.getHistory()
                     }
                     .subscribe({
-                        musicManager.playingList.addAll(it)
-                        if (musicManager.playingList.size > 0) {
-                            musicManager.playPosition = 0
+                        // add default list to playing list
+                        if (musicManager.playingList.isEmpty()) {
+                            musicManager.playingList.addAll(it)
+                            if (musicManager.playingList.size > 0) {
+                                musicManager.playPosition = 0
+                            }
                         }
                     }, {
                         ifDebug {

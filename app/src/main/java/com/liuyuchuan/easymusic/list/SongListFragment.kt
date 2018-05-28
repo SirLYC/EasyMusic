@@ -104,6 +104,11 @@ class SongListFragment : BaseFragment(), CheckableItemViewBinder.OnRealItemClick
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
+    }
+
     override fun onDestroyOptionsMenu() {
         menuItemEdit = null
         menuItemDelete = null

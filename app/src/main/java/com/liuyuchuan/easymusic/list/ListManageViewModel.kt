@@ -108,7 +108,9 @@ class ListManageViewModel(
                         songRepository.addSongTo(musicList.name, it.realItem)
                     }
                     .doOnTerminate {
-                        musicList.list.addAll(musicList.list)
+                        musicList.list.addAll(checkedList
+                                .map { it.realItem }
+                                .filter { !musicList.list.contains(it) })
                         addToMusicListEvent.value.result(false)?.let {
                             addToMusicListEvent.value = it
                         }
@@ -133,7 +135,9 @@ class ListManageViewModel(
                         songRepository.deleteSong(musicList.name, it.realItem)
                     }
                     .doOnTerminate {
-                        musicList.list.addAll(musicList.list)
+                        musicList.list.removeAll(checkedList.map {
+                            it.realItem
+                        })
                         deleteSongEvent.value.result(false)?.let(deleteSongEvent::setValue)
                     }
                     .subscribe({
