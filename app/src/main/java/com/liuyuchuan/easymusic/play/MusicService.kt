@@ -293,6 +293,8 @@ class MusicService : Service(), MediaPlayer.OnCompletionListener {
             postProgressUpdate = enable
         }
 
+        fun mediaPlayer() = mediaPlayer
+
         fun playModeLiveData() = playModeLiveData
         fun playingSongLiveData() = playingSongLiveData
         fun playProgressLiveData() = playProgressLiveData

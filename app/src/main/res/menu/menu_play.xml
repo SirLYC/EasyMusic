@@ -6,4 +6,11 @@
         android:icon="@drawable/ic_clock"
         android:id="@+id/history"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:title="@string/title_menu_track"
+        android:icon="@drawable/ic_track_change"
+        android:id="@+id/change_track"
+        app:showAsAction="ifRoom"/>
+
 </menu>

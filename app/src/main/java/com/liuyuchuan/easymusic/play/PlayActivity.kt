@@ -5,8 +5,10 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -16,10 +18,12 @@ import com.liuyuchuan.easymusic.BaseActivity
 import com.liuyuchuan.easymusic.R
 import com.liuyuchuan.easymusic.data.Song
 import com.liuyuchuan.easymusic.history.HistoryActivity
+import com.liuyuchuan.easymusic.ifDebug
 import com.liuyuchuan.easymusic.utils.PlayState
 import com.liuyuchuan.easymusic.utils.formatTime
 import com.liuyuchuan.easymusic.utils.toast
 import kotlinx.android.synthetic.main.activity_play.*
+import java.util.*
 import kotlin.math.roundToInt
 
 /**
@@ -96,7 +100,48 @@ class PlayActivity : BaseActivity(), View.OnClickListener, SeekBar.OnSeekBarChan
                 startActivity(Intent(this, HistoryActivity::class.java))
                 true
             }
+
+            R.id.change_track -> {
+                changeTrackInfo()
+                true
+            }
             else -> false
+        }
+    }
+
+    private fun changeTrackInfo() {
+        if (Build.VERSION.SDK_INT <= 15) {
+            toast(R.string.error_low_version)
+        } else {
+            musicBinder.playState().value.let {
+                if (it !== PlayState.NotReady && it !== PlayState.Preparing) {
+                    val arr = musicBinder.mediaPlayer().trackInfo
+
+                    ifDebug {
+                        Log.d("PlayActivity", Arrays.toString(arr))
+                    }
+
+                    if (arr.isEmpty()) {
+                        toast(R.string.error_no_selectable_track_info)
+                        return
+                    }
+
+                    val items = Array(arr.size, { "Audio $it" })
+
+                    AlertDialog.Builder(this)
+                            .setTitle("设置音轨")
+                            .setItems(items, { _, w ->
+                                try {
+                                    musicBinder.mediaPlayer().selectTrack(w)
+                                } catch (e: Exception) {
+                                    ifDebug {
+                                        e.printStackTrace()
+                                    }
+                                }
+                            })
+                            .show()
+                }
+            }
         }
     }
 

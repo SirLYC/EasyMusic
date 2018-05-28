@@ -57,6 +57,14 @@ class DBHelper(context: Context) : SQLiteOpenHelper(context, "easyMusic", null, 
     }
 
     fun insertList(name: String, sortMethod: Int = SORT_DEFAULT): Boolean {
+        val row = writableDatabase.update(TABLE_LIST, ContentValues().apply {
+            put("name", name)
+            put("sortMethod", sortMethod)
+        }, "name=?", arrayOf(name))
+
+        if (row > 0) {
+            return true
+        }
         return writableDatabase.insert(TABLE_LIST, null, ContentValues().apply {
             put("name", name)
             put("sortMethod", sortMethod)

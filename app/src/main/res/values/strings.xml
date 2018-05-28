@@ -26,4 +26,7 @@
     <string name="title_add_to_play_list">添加到播放列表</string>
     <string name="error_no_lists_checked">未选中列表项</string>
     <string name="title_menu_sort">排序</string>
+    <string name="title_menu_track">改变音轨</string>
+    <string name="error_no_selectable_track_info">没有可选择音轨</string>
+    <string name="error_low_version">当前系统版本不支持调整音轨</string>
 </resources>
